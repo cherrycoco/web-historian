@@ -65,7 +65,25 @@ var addUrlToList = function(url, callback) {
 exports.addUrlToList = addUrlToList;
 
 var isUrlArchived = function(url, callback) {
+  fs.exists(paths.archivedSites + '/' + url, function(exists) {
+    if (exists) {
+      callback(true);
+    } else {
+      callback(false);
+    }
+  });
 };
 
+exports.isUrlArchived = isUrlArchived;
+
 var downloadUrls = function(urls) {
+  urls.forEach(function (url) {
+    fs.writeFile(paths.archivedSites + '/' + url, url, function (err) {
+      if (err) {
+        console.log(err);
+      }
+    });
+  });
 };
+
+exports.downloadUrls = downloadUrls;
