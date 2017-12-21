@@ -19,6 +19,7 @@ describe('server', function() {
   describe('GET /', function () {
     it('should return the content of index.html', function (done) {
       // just assume that if it contains an <input> tag its index.html
+      console.log('test input: ', /<input/);
       request
         .get('/')
         .expect(200, /<input/, done);
