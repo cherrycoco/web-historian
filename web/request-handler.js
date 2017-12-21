@@ -41,41 +41,18 @@ exports.handleRequest = function (req, res) {
   } 
   
   if (req.method === 'POST') {
-    console.log('stringified url', url);
     var body = '';
     req.on('data', function(data) {
       data = data.toString();
       body += data.slice(4) + '\n';
     });  
+    var location = archive.paths.archivedSites + '/' + body;
     req.on('end', function() {
       archive.addUrlToList(body, function() {
-        res.writeHead(302, {'Content-Type': 'text/form'});
+        console.log('body is: ', body);
+        res.writeHead(302, {'Location': location, 'Content-Type': 'text/html'});
         res.end(body);
       });
     });
-  }
-  
-  
+  }  
 };
-
- // describe('POST', function () {
- //      it('should append submitted sites to \'sites.txt\'', function(done) {
- //        var url = 'www.example.com';
-
- //        // Reset the test file and process request
- //        fs.closeSync(fs.openSync(archive.paths.list, 'w'));
-
- //        request
- //          .post('/')
- //          .type('form')
- //          .send({ url: url })
- //          .expect(302, function (err) {
- //            if (!err) {
- //              var fileContents = fs.readFileSync(archive.paths.list, 'utf8');
- //              expect(fileContents).to.equal(url + '\n');
- //            }
-
- //            done(err);
- //          });
- //      });
- //    });

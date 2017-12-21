@@ -1,6 +1,7 @@
 var fs = require('fs');
 var path = require('path');
 var _ = require('underscore');
+var request = require('request');
 
 /*
  * You will need to reuse the same paths many times over in the course of this sprint.
@@ -78,10 +79,12 @@ exports.isUrlArchived = isUrlArchived;
 
 var downloadUrls = function(urls) {
   urls.forEach(function (url) {
-    fs.writeFile(paths.archivedSites + '/' + url, url, function (err) {
-      if (err) {
-        console.log(err);
-      }
+    request('https://' + url, function (err, res, body) {
+      fs.writeFile(paths.archivedSites + '/' + url, body, function (err) {
+        if (err) {
+          console.log(err);
+        }
+      });
     });
   });
 };
