@@ -12,6 +12,7 @@ var defaultCorsHeaders = {
 };
 
 var headers = defaultCorsHeaders;
+var loadingLocation = __dirname + '/public/loading.html';
 headers['Content-Type'] = 'text/html';
 
 exports.handleRequest = function (req, res) {
@@ -23,6 +24,9 @@ exports.handleRequest = function (req, res) {
         res.writeHead(200, {'Content-Type': 'text/html'});
         res.end(data.toString());
       });
+    } else if (endPoint === loadingLocation) {
+      res.writeHead(200, {'Content-Type': 'text/html'});
+      res.end('example');
     } else {
       archive.isUrlArchived(req.url, function(exists) {
         if (exists) {
@@ -31,8 +35,10 @@ exports.handleRequest = function (req, res) {
             res.end(data);
           });
         } else {
-          res.writeHead(404, {'Content-Type': 'text/plain'});
+          res.writeHead(200, {'Content-Type': 'text/html'});
           res.end();
+          // res.writeHead(404, {'Content-Type': 'text/plain'});
+          // res.end();
         }
 
       });
@@ -42,16 +48,30 @@ exports.handleRequest = function (req, res) {
   
   if (req.method === 'POST') {
     var body = '';
+    
     req.on('data', function(data) {
       data = data.toString();
       body += data.slice(4) + '\n';
+      console.log('body inside', body);
     });  
+    
+    console.log('body outside', body);
     var location = archive.paths.archivedSites + '/' + body;
+    console.log('location', location);
+    
     req.on('end', function() {
       archive.addUrlToList(body, function() {
-        console.log('body is: ', body);
-        res.writeHead(302, {'Location': location, 'Content-Type': 'text/html'});
-        res.end(body);
+        archive.isUrlArchived(req.url, function(exists) {
+          if (exists) {
+            res.writeHead(302, {'Location': location, 'Content-Type': 'text/html'});
+            console.log('exist', location);
+            res.end(body);
+          } else {
+            res.writeHead(302, {'Location': loadingLocation, 'Content-Type': 'text/html'});
+            console.log('does not exist', loadingLocation);
+            res.end();
+          }
+        });
       });
     });
   }  

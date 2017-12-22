@@ -79,13 +79,15 @@ exports.isUrlArchived = isUrlArchived;
 
 var downloadUrls = function(urls) {
   urls.forEach(function (url) {
-    request('https://' + url, function (err, res, body) {
-      fs.writeFile(paths.archivedSites + '/' + url, body, function (err) {
-        if (err) {
-          console.log(err);
-        }
+    if (!paths.archivedSites + '/' + url) {
+      request('https://' + url, function (err, res, body) {
+        fs.writeFile(paths.archivedSites + '/' + url, body, function (err) {
+          if (err) {
+            console.log(err);
+          }
+        });
       });
-    });
+    }
   });
 };
 
